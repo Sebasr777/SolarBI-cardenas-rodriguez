@@ -1,0 +1,9 @@
+.git
+data/
+docs/
+powerbi/
+k8s/
+**/__pycache__
+.env
+*.sqlite
+*.zst
