@@ -1,0 +1,7 @@
+# Aísla todos los recursos del proyecto en su propio espacio de nombres.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: solarbi
+  labels:
+    app.kubernetes.io/part-of: solarbi

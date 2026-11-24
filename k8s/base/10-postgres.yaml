@@ -1,0 +1,77 @@
+# PostgreSQL: StatefulSet + volumen persistente (PVC).
+# Se elige StatefulSet y no Deployment porque la base tiene estado: el pod conserva su
+# identidad (postgres-0) y su PVC propio; si el pod se borra, el nuevo se monta en el MISMO volumen.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres            # nombre DNS interno: el ETL, el simulador y Grafana usan "postgres"
+  labels: { app: postgres }
+spec:
+  clusterIP: None           # servicio "headless" requerido por el StatefulSet
+  selector: { app: postgres }
+  ports: [{ name: pg, port: 5432 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-externo    # acceso desde el anfitrión: DBeaver y Power BI → localhost:30432
+  labels: { app: postgres }
+spec:
+  type: NodePort
+  selector: { app: postgres }
+  ports: [{ name: pg, port: 5432, targetPort: 5432, nodePort: 30432 }]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels: { app: postgres }
+  template:
+    metadata:
+      labels: { app: postgres }
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.4-alpine
+          ports: [{ containerPort: 5432, name: pg }]
+          env:
+            - { name: PGDATA, value: /var/lib/postgresql/data/pgdata }
+            - name: POSTGRES_DB
+              valueFrom: { configMapKeyRef: { name: solarbi-config, key: PGDATABASE } }
+            - name: POSTGRES_USER
+              valueFrom: { secretKeyRef: { name: solarbi-secret, key: POSTGRES_USER } }
+            - name: POSTGRES_PASSWORD
+              valueFrom: { secretKeyRef: { name: solarbi-secret, key: POSTGRES_PASSWORD } }
+            - name: BI_LECTOR_PASSWORD
+              valueFrom: { secretKeyRef: { name: solarbi-secret, key: BI_LECTOR_PASSWORD } }
+            - name: GRAFANA_DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: solarbi-secret, key: GRAFANA_DB_PASSWORD } }
+            - name: SIM_DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: solarbi-secret, key: SIM_DB_PASSWORD } }
+          volumeMounts:
+            - { name: datos, mountPath: /var/lib/postgresql/data }
+            - { name: init, mountPath: /docker-entrypoint-initdb.d, readOnly: true }
+          readinessProbe:            # ¿acepta conexiones? si no, el Service no le envía tráfico
+            exec: { command: ["sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"] }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:             # ¿sigue vivo? si falla 6 veces seguidas, Kubernetes lo reinicia
+            exec: { command: ["sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"] }
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 6
+          resources:
+            requests: { cpu: 250m, memory: 512Mi }
+            limits:   { cpu: "1",  memory: 1Gi }
+      volumes:
+        - name: init
+          configMap: { name: postgres-init, defaultMode: 0755 }
+  volumeClaimTemplates:          # crea el PVC datos-postgres-0 (5 GiB) que sobrevive al pod
+    - metadata: { name: datos }
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources: { requests: { storage: 5Gi } }

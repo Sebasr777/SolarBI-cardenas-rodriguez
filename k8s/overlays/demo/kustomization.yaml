@@ -1,0 +1,21 @@
+# Ambiente DEMO (bonificación Kustomize): mismo despliegue con ajustes para la presentación.
+#  - Grafana con 2 réplicas (Grafana no guarda estado propio: escala sin problema)
+#  - el simulador rellena 6 horas al iniciar para que las gráficas se vean llenas
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - path: ../dev/ruta-datos.local.yaml
+  - target: { kind: Deployment, name: grafana }
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+configMapGenerator:
+  - name: solarbi-config
+    behavior: merge
+    literals:
+      - BACKFILL_MIN=360
+generatorOptions:
+  disableNameSuffixHash: true

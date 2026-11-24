@@ -1,0 +1,32 @@
+# Base de Kubernetes de SolarBI. Se aplica a través de un overlay (dev o demo):
+#   kubectl kustomize --load-restrictor LoadRestrictionsNone k8s/overlays/dev | kubectl apply -f -
+# (el script scripts/solarbi.sh lo hace en un solo comando)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: solarbi
+labels:
+  - pairs: { app.kubernetes.io/part-of: solarbi }
+resources:
+  - 00-namespace.yaml
+  - 10-postgres.yaml
+  - 20-etl-job.yaml
+  - 30-simulador-cronjob.yaml
+  - 40-grafana.yaml
+generatorOptions:
+  disableNameSuffixHash: true      # nombres fijos: se pueden editar en vivo con kubectl
+configMapGenerator:
+  - name: solarbi-config           # configuración no sensible
+    envs: [config.env]
+  - name: postgres-init            # script que crea los roles la primera vez
+    files: [../../db/init/00_roles.sh]
+  - name: grafana-datasources
+    files: [../../grafana/provisioning/datasources/postgres.yaml]
+  - name: grafana-proveedor
+    files: [../../grafana/provisioning/dashboards/tableros.yaml]
+  - name: grafana-alertas
+    files: [../../grafana/provisioning/alerting/alertas.yaml]
+  - name: grafana-tableros
+    files: [../../grafana/dashboards/microrred.json]
+secretGenerator:
+  - name: solarbi-secret           # credenciales: salen del .env local (NO versionado)
+    envs: [../../.env]

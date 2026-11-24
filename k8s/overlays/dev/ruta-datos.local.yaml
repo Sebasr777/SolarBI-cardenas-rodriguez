@@ -1,0 +1,12 @@
+﻿apiVersion: batch/v1
+kind: Job
+metadata:
+  name: etl
+spec:
+  template:
+    spec:
+      volumes:
+        - name: bronze
+          hostPath:
+            path: /run/desktop/mnt/host/c/Users/USER/Downloads/solarbi/data/bronze
+            type: Directory

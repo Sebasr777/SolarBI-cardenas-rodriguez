@@ -1,0 +1,15 @@
+# Ejemplo del parche que genera el script. En Docker Desktop:
+#   Mac:     /Users/<usuario>/.../solarbi/data/bronze
+#   Windows: /run/desktop/mnt/host/c/Users/<usuario>/.../solarbi/data/bronze
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: etl
+spec:
+  template:
+    spec:
+      volumes:
+        - name: bronze
+          hostPath:
+            path: /Users/usuario/solarbi/data/bronze
+            type: Directory

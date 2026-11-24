@@ -1,0 +1,40 @@
+# ETL: Job. Corre una vez, termina y deja evidencia (estado Complete, logs y tablas audit.*).
+# Se elige Job y no Deployment porque no es un servicio que deba quedar encendido.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: etl
+  labels: { app: etl }
+spec:
+  backoffLimit: 2                 # hasta 2 reintentos si falla
+  template:
+    metadata:
+      labels: { app: etl }
+    spec:
+      restartPolicy: Never
+      initContainers:             # espera a que PostgreSQL acepte conexiones
+        - name: esperar-postgres
+          image: postgres:16.4-alpine
+          command: ["sh", "-c", "until pg_isready -h postgres -p 5432; do echo esperando postgres; sleep 3; done"]
+          resources:
+            requests: { cpu: 50m, memory: 32Mi }
+            limits:   { cpu: 100m, memory: 64Mi }
+      containers:
+        - name: etl
+          image: solarbi-etl:1.0
+          imagePullPolicy: IfNotPresent   # la imagen se construye en el mismo Docker del clúster
+          envFrom:
+            - configMapRef: { name: solarbi-config }
+          env:
+            - name: PGUSER
+              valueFrom: { secretKeyRef: { name: solarbi-secret, key: POSTGRES_USER } }
+            - name: PGPASSWORD
+              valueFrom: { secretKeyRef: { name: solarbi-secret, key: POSTGRES_PASSWORD } }
+          volumeMounts:
+            - { name: bronze, mountPath: /datos/bronze, readOnly: true }
+          resources:
+            requests: { cpu: 500m, memory: 2Gi }
+            limits:   { cpu: "2",  memory: 5Gi }
+      volumes:
+        - name: bronze            # capa Bronze: carpeta del anfitrión, solo lectura (la ruta la fija el overlay)
+          hostPath: { path: /RUTA/DEFINIDA/EN/EL/OVERLAY, type: Directory }

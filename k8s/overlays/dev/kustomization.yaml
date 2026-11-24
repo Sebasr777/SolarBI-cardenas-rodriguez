@@ -1,0 +1,9 @@
+# Ambiente DEV: el de desarrollo y sustentación (1 réplica de Grafana).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  # Ruta de la carpeta data/bronze en ESTE equipo. La genera scripts/solarbi.sh (o .ps1)
+  # porque cambia según el sistema operativo y el usuario; por eso no se versiona.
+  - path: ruta-datos.local.yaml

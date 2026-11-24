@@ -1,0 +1,46 @@
+
+# Simulador: CronJob cada minuto.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: simulador
+  labels:
+    app: simulador
+spec:
+  schedule: "* * * * *"
+  suspend: true
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 50
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: simulador
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: simulador
+              image: solarbi-simulador:1.0
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - configMapRef:
+                    name: solarbi-config
+              env:
+                - name: PGUSER
+                  value: simulador
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: solarbi-secret
+                      key: SIM_DB_PASSWORD
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 250m
+                  memory: 128Mi
