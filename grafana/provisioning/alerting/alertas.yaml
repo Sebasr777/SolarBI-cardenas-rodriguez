@@ -1,0 +1,98 @@
+# Dos reglas de alerta sobre KPIs operativos. Los UMBRALES llegan por variables de entorno
+# desde el ConfigMap (UMBRAL_SOC_ALERTA, UMBRAL_RED_V_ALERTA): se cambian sin reconstruir la imagen
+# con `kubectl edit configmap solarbi-config` + `kubectl rollout restart deployment/grafana`.
+apiVersion: 1
+
+# El canal de notificación (correo, Teams, Telegram) se configura en producción con las
+# credenciales del turno; en la demo la alerta se ve en el panel "Alertas activas" y en
+# Alerting → Alert rules (Normal → Pending → Firing).
+
+groups:
+  - orgId: 1
+    name: Microrred
+    folder: SolarBI
+    interval: 30s
+    rules:
+      # ---------------------------------------------------------------
+      # A1 · Batería con carga baja
+      # ---------------------------------------------------------------
+      - uid: alerta-soc-bajo
+        title: Batería con carga baja (SoC)
+        condition: C
+        for: 2m
+        annotations:
+          summary: 'Inversor {{ $labels.inversor }}: SoC promedio de 5 min = {{ $values.B.Value }} %'
+          description: >
+            El SoC bajó del umbral de ${UMBRAL_SOC_ALERTA} %. El inversor dispara su propia alarma al 15 %
+            y pasa la carga a la red al 10 %: este aviso deja margen para actuar antes.
+        labels:
+          severidad: critica
+        data:
+          - refId: A
+            datasourceUid: pg-solarbi
+            relativeTimeRange: { from: 600, to: 0 }
+            model:
+              refId: A
+              editorMode: code
+              format: table
+              rawQuery: true
+              rawSql: >
+                SELECT 'Inversor ' || cod_inversor AS inversor, AVG(soc_pct)::float AS soc
+                FROM gold.fact_lectura_rt
+                WHERE ts > now() - interval '5 minutes'
+                GROUP BY cod_inversor
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator: { type: lt, params: [20] }
+        noDataState: OK
+        execErrState: Error
+
+      # ---------------------------------------------------------------
+      # A2 · Corte de la red pública
+      # ---------------------------------------------------------------
+      - uid: alerta-corte-red
+        title: Corte de la red pública
+        condition: C
+        for: 1m
+        annotations:
+          summary: 'Inversor {{ $labels.inversor }}: tensión mínima de red = {{ $values.B.Value }} V'
+          description: >
+            La tensión de red bajó de ${UMBRAL_RED_V_ALERTA} V (nominal 230 V). La microrred quedó en isla:
+            la carga depende solo del sol y de la batería.
+        labels:
+          severidad: advertencia
+        data:
+          - refId: A
+            datasourceUid: pg-solarbi
+            relativeTimeRange: { from: 600, to: 0 }
+            model:
+              refId: A
+              editorMode: code
+              format: table
+              rawQuery: true
+              rawSql: >
+                SELECT 'Inversor ' || cod_inversor AS inversor, MIN(red_v)::float AS red_v
+                FROM gold.fact_lectura_rt
+                WHERE ts > now() - interval '3 minutes'
+                GROUP BY cod_inversor
+          - refId: B
+            datasourceUid: __expr__
+            model: { refId: B, type: reduce, expression: A, reducer: last }
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator: { type: lt, params: [180] }
+        noDataState: OK
+        execErrState: Error

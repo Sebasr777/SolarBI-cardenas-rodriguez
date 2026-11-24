@@ -1,0 +1,11 @@
+# Le dice a Grafana dónde están los tableros (JSON) que debe cargar al iniciar.
+apiVersion: 1
+providers:
+  - name: SolarBI
+    folder: SolarBI
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards

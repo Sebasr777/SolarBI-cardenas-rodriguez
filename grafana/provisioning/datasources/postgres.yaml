@@ -1,0 +1,21 @@
+# Fuente de datos aprovisionada: Grafana la crea sola al arrancar.
+# La contraseña NO está aquí: llega por la variable de entorno GRAFANA_DB_PASSWORD (Secret de Kubernetes).
+# "postgres" es el nombre del Service: Grafana encuentra la base por DNS, no por IP.
+apiVersion: 1
+datasources:
+  - name: PostgreSQL-SolarBI
+    uid: pg-solarbi
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: ${PGHOST_GRAFANA}:5432
+    user: grafana_ro
+    isDefault: true
+    editable: false
+    jsonData:
+      database: solarbi
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
+      maxOpenConns: 5
+    secureJsonData:
+      password: ${GRAFANA_DB_PASSWORD}
