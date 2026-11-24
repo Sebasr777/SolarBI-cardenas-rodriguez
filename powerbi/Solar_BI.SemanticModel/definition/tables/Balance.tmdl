@@ -1,0 +1,30 @@
+table Balance
+	lineageTag: b781a7fe-92f8-4b2c-ac8e-cceb34f8edcf
+
+	column Lado
+		dataType: string
+		lineageTag: c4cc5fa7-9623-4094-9c7a-3343da6b10f9
+		summarizeBy: none
+		sourceColumn: [Lado]
+
+	column Componente
+		dataType: string
+		lineageTag: bbb85af2-7265-48aa-a7d6-db2267d1a148
+		summarizeBy: none
+		sourceColumn: [Componente]
+		sortByColumn: Orden
+
+	column Orden
+		dataType: int64
+		isHidden
+		lineageTag: 57059b26-08f5-448f-9aff-6dbbd53ce002
+		summarizeBy: none
+		sourceColumn: [Orden]
+
+	partition Balance = calculated
+		mode: import
+		source =
+				DATATABLE ( "Lado", STRING, "Componente", STRING, "Orden", INTEGER, {
+					{ "1 · De dónde viene", "Sol", 1 }, { "1 · De dónde viene", "Red pública", 2 }, { "1 · De dónde viene", "Batería (descarga)", 3 },
+					{ "2 · A dónde va", "Carga (equipos)", 4 }, { "2 · A dónde va", "Batería (carga)", 5 }, { "2 · A dónde va", "Pérdidas de conversión", 6 } } )
+

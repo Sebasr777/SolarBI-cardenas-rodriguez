@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "8121f83adb2dd801460d",
+  "displayName": "Perfil Horario y Batería",
+  "displayOption": "FitToPage",
+  "height": 1080,
+  "width": 1920
+}

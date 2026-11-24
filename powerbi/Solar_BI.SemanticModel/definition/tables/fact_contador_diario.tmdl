@@ -1,0 +1,58 @@
+table fact_contador_diario
+	lineageTag: 72d66fa6-406f-4f20-bcfa-febd77df9f89
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		lineageTag: 0f5f44db-d8a6-4372-ab9b-76ed3c493e20
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		lineageTag: f3f14869-3415-4196-9ef0-4bce66074c1d
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+	column pv_kwh
+		dataType: double
+		lineageTag: 99fedd2a-b5e5-4f4b-b4e8-3b5588a9380b
+		summarizeBy: none
+		sourceColumn: pv_kwh
+
+	column carga_kwh
+		dataType: double
+		lineageTag: 90c69577-f0d2-436b-96e4-45da6acfa944
+		summarizeBy: none
+		sourceColumn: carga_kwh
+
+	column carga_desde_red_kwh
+		dataType: double
+		lineageTag: b5a35f8a-fd9a-400f-afb3-b15e3be882c6
+		summarizeBy: none
+		sourceColumn: carga_desde_red_kwh
+
+	column bat_carga_kwh
+		dataType: double
+		lineageTag: f901718b-7e6d-4d4e-954d-fd88f62e983d
+		summarizeBy: none
+		sourceColumn: bat_carga_kwh
+
+	column bat_descarga_kwh
+		dataType: double
+		lineageTag: 04a8b080-ffdf-4b31-bfea-c8bcaadd1836
+		summarizeBy: none
+		sourceColumn: bat_descarga_kwh
+
+	partition fact_contador_diario = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="fact_contador_diario"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

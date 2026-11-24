@@ -1,0 +1,204 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1493.6436378828566,
+            "y": 507.75828183073781
+          },
+          "nodeIndex": "_Medidas",
+          "nodeLineageTag": "8ca69484-ec4f-4057-b5aa-190d17b41526",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1777.6436378828566,
+            "y": 581.75828183073781
+          },
+          "nodeIndex": "Balance",
+          "nodeLineageTag": "b781a7fe-92f8-4b2c-ac8e-cceb34f8edcf",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1259.6436378828566,
+            "y": 752.08132086893488
+          },
+          "nodeIndex": "dim_dispositivo",
+          "nodeLineageTag": "25c3ca93-cbf7-4e5c-abf1-d933a49b2d5f",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 279.7927314890195,
+            "y": 251.76342639633094
+          },
+          "nodeIndex": "dim_fecha",
+          "nodeLineageTag": "79f58f9b-71ce-402b-82e9-cbe0dc2aeaa4",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 829.64237320394454,
+            "y": 932.92074106232485
+          },
+          "nodeIndex": "dim_hora",
+          "nodeLineageTag": "76ae6b45-3685-41e8-a139-8de26d3bf764",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 390.0068989067787,
+            "y": 608.31530449137722
+          },
+          "nodeIndex": "dim_inversor",
+          "nodeLineageTag": "e3ac98b0-7cb0-4bc1-9086-2707784c5a30",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 566.62738470116255,
+            "y": -50
+          },
+          "nodeIndex": "dim_tipo_contexto",
+          "nodeLineageTag": "63b0f9dd-9b57-4dc3-ba11-692daddd7bfe",
+          "size": {
+            "height": 272,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1140.5721997289202,
+            "y": 218.43122373427673
+          },
+          "nodeIndex": "dim_tipo_evento",
+          "nodeLineageTag": "32723fb5-db99-4f5d-9941-d73f2b5187c8",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 969.66566880168443,
+            "y": 575.76727673625169
+          },
+          "nodeIndex": "fact_actividad",
+          "nodeLineageTag": "c969cd90-44db-444a-b2bc-ba718620cff0",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": 696.07391039956872
+          },
+          "nodeIndex": "fact_contador_diario",
+          "nodeLineageTag": "72d66fa6-406f-4f20-bcfa-febd77df9f89",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 339.92865829122,
+            "y": 965.51656366147574
+          },
+          "nodeIndex": "fact_energia_hora",
+          "nodeLineageTag": "595be69c-9635-47c5-857c-0f4df68763a3",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 679.86554971446446,
+            "y": 278.64283390027913
+          },
+          "nodeIndex": "fact_evento",
+          "nodeLineageTag": "7cb02d82-42a4-4c4c-bda1-28af767283e0",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2061.6436378828566,
+            "y": 557.75828183073781
+          },
+          "nodeIndex": "Paneles adicionales",
+          "nodeLineageTag": "cc7a068d-d260-4046-bfc8-6f6a838ea882",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2345.6436378828566,
+            "y": 557.75828183073781
+          },
+          "nodeIndex": "Tarifa",
+          "nodeLineageTag": "07c4730b-8fcc-42a2-a353-59a84c3b0486",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "Todas las tablas",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "Todas las tablas",
+  "defaultDiagram": "Todas las tablas"
+}

@@ -1,0 +1,79 @@
+table fact_evento
+	lineageTag: 7cb02d82-42a4-4c4c-bda1-28af767283e0
+
+	column id_evento
+		dataType: int64
+		isHidden
+		lineageTag: ca38f097-4c55-4170-924c-3b74d8735031
+		summarizeBy: none
+		sourceColumn: id_evento
+
+	column sk_tipo_evento
+		dataType: int64
+		isHidden
+		lineageTag: 5bbb4646-96a2-49e6-a705-e3a47975d85c
+		summarizeBy: none
+		sourceColumn: sk_tipo_evento
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		lineageTag: 482fa52c-9458-4908-af16-04f5d83e1ae7
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		lineageTag: c624827e-e54a-4ecb-98cc-c1506ffd5e3b
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+	column sk_hora
+		dataType: int64
+		isHidden
+		lineageTag: dcf0062c-15f3-4da1-b9bc-2978733eeec1
+		summarizeBy: none
+		sourceColumn: sk_hora
+
+	column inicio_utc
+		dataType: dateTime
+		lineageTag: 20b8ef82-1446-4963-9123-aa2500ad8c5c
+		summarizeBy: none
+		sourceColumn: inicio_utc
+
+	column fin_utc
+		dataType: dateTime
+		lineageTag: b8702f21-c67f-44e5-a85e-a4a829aa519d
+		summarizeBy: none
+		sourceColumn: fin_utc
+
+	column duracion_min
+		dataType: double
+		lineageTag: a40f296b-8122-446e-99cd-ffa5c6bce330
+		summarizeBy: none
+		sourceColumn: duracion_min
+
+	column valor_extremo
+		dataType: double
+		lineageTag: 1428664e-4750-4e96-84c5-ca91065647db
+		summarizeBy: none
+		sourceColumn: valor_extremo
+
+	column descripcion
+		dataType: string
+		lineageTag: 3abd7302-1a40-4cf6-9f20-793d2f24fb2f
+		summarizeBy: none
+		sourceColumn: descripcion
+
+	partition fact_evento = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="fact_evento"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

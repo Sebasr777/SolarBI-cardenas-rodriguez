@@ -1,0 +1,131 @@
+table dim_fecha
+	lineageTag: 79f58f9b-71ce-402b-82e9-cbe0dc2aeaa4
+	dataCategory: Time
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		lineageTag: f7b1b69d-03d1-49d9-a130-ef1dc2ec0943
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+	column fecha
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 36dedd36-d12b-4975-b9a8-c88d4f76bba2
+		summarizeBy: none
+		sourceColumn: fecha
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column anio
+		dataType: int64
+		lineageTag: dde681f6-46f5-42b8-9dcd-5642ffc0aaf6
+		summarizeBy: none
+		sourceColumn: anio
+
+	column trimestre
+		dataType: int64
+		lineageTag: 29599c39-4cc3-4458-816e-b16d91302277
+		summarizeBy: none
+		sourceColumn: trimestre
+
+	column mes
+		dataType: int64
+		lineageTag: 5a93e576-364f-49be-b1ae-54c3de070510
+		summarizeBy: none
+		sourceColumn: mes
+
+	column mes_nombre
+		dataType: string
+		lineageTag: 3b82a1e1-d13b-4ec3-ba42-bb2fb23e05e0
+		summarizeBy: none
+		sourceColumn: mes_nombre
+		sortByColumn: mes
+
+	column anio_mes
+		dataType: string
+		lineageTag: dc287cc2-e634-4bc0-ba57-89933e8cc208
+		summarizeBy: none
+		sourceColumn: anio_mes
+
+	column semana_iso
+		dataType: int64
+		lineageTag: 9fee0e1f-1efa-49d4-acc8-ce904f10f8f9
+		summarizeBy: none
+		sourceColumn: semana_iso
+
+	column dia_mes
+		dataType: int64
+		lineageTag: 8feb0c09-9abe-4dd6-9d6b-257a79e7d404
+		summarizeBy: none
+		sourceColumn: dia_mes
+
+	column dia_semana_num
+		dataType: int64
+		lineageTag: 2cf4291e-4fc9-451e-bea0-9617670c4efc
+		summarizeBy: none
+		sourceColumn: dia_semana_num
+
+	column dia_semana
+		dataType: string
+		lineageTag: f4398f06-0b6d-4937-8725-c98f8e97c40a
+		summarizeBy: none
+		sourceColumn: dia_semana
+		sortByColumn: dia_semana_num
+
+	column es_fin_semana
+		dataType: boolean
+		lineageTag: 119a4e84-1911-4bfd-9269-923c9500e502
+		summarizeBy: none
+		sourceColumn: es_fin_semana
+
+	column estacion
+		dataType: string
+		lineageTag: 03fa941b-d041-4d0d-aee8-85f3ecf43f10
+		summarizeBy: none
+		sourceColumn: estacion
+
+	column temporada_lluvia
+		dataType: boolean
+		lineageTag: 4bbd0c6a-e8a6-43f3-9c40-febcd64a6737
+		summarizeBy: none
+		sourceColumn: temporada_lluvia
+
+	column con_telemetria
+		dataType: boolean
+		lineageTag: 253f1c51-d4d8-4c0d-a70d-2cdba6147a18
+		summarizeBy: none
+		sourceColumn: con_telemetria
+
+	hierarchy Calendario
+		lineageTag: 41794bd5-64cb-49fa-bf8c-68647fcbb701
+
+		level Año
+			lineageTag: c3fca135-1e8c-4aca-b527-a72f8773c5f5
+			column: anio
+
+		level Trimestre
+			lineageTag: 3dbdd4e4-4df0-4cc4-a3f9-a5a8dd3a9e15
+			column: trimestre
+
+		level Mes
+			lineageTag: e43cf8de-1a99-4685-bb69-af3cdaa7c707
+			column: mes_nombre
+
+		level Día
+			lineageTag: b60b2508-4812-43f7-b587-fdea5e67a7e2
+			column: fecha
+
+	partition dim_fecha = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="dim_fecha"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

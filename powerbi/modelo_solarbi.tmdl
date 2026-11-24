@@ -1,0 +1,942 @@
+createOrReplace
+
+	expression ServidorPostgres = "localhost:30432" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+	expression BaseDatos = "solarbi" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+	table dim_fecha
+		dataCategory: Time
+
+		column sk_fecha
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_fecha
+
+		column fecha
+			dataType: dateTime
+			isKey
+			formatString: dd/mm/yyyy
+			summarizeBy: none
+			sourceColumn: fecha
+
+		column anio
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: anio
+
+		column trimestre
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: trimestre
+
+		column mes
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: mes
+
+		column mes_nombre
+			dataType: string
+			summarizeBy: none
+			sortByColumn: mes
+			sourceColumn: mes_nombre
+
+		column anio_mes
+			dataType: string
+			summarizeBy: none
+			sourceColumn: anio_mes
+
+		column semana_iso
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: semana_iso
+
+		column dia_mes
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: dia_mes
+
+		column dia_semana_num
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: dia_semana_num
+
+		column dia_semana
+			dataType: string
+			summarizeBy: none
+			sortByColumn: dia_semana_num
+			sourceColumn: dia_semana
+
+		column es_fin_semana
+			dataType: boolean
+			summarizeBy: none
+			sourceColumn: es_fin_semana
+
+		column estacion
+			dataType: string
+			summarizeBy: none
+			sourceColumn: estacion
+
+		column temporada_lluvia
+			dataType: boolean
+			summarizeBy: none
+			sourceColumn: temporada_lluvia
+
+		column con_telemetria
+			dataType: boolean
+			summarizeBy: none
+			sourceColumn: con_telemetria
+
+		hierarchy 'Calendario'
+			level 'Año'
+				ordinal: 0
+				column: anio
+			level 'Trimestre'
+				ordinal: 1
+				column: trimestre
+			level 'Mes'
+				ordinal: 2
+				column: mes_nombre
+			level 'Día'
+				ordinal: 3
+				column: fecha
+
+		partition dim_fecha = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="dim_fecha"]}[Data]
+					in
+					    Tabla
+
+	table dim_hora
+
+		column sk_hora
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_hora
+
+		column hora
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: hora
+
+		column etiqueta
+			dataType: string
+			summarizeBy: none
+			sourceColumn: etiqueta
+
+		column franja
+			dataType: string
+			summarizeBy: none
+			sourceColumn: franja
+
+		column periodo_solar
+			dataType: string
+			summarizeBy: none
+			sourceColumn: periodo_solar
+
+		column franja_tarifaria
+			dataType: string
+			summarizeBy: none
+			sourceColumn: franja_tarifaria
+
+		hierarchy 'Día solar'
+			level 'Franja'
+				ordinal: 0
+				column: franja
+			level 'Hora'
+				ordinal: 1
+				column: etiqueta
+
+		partition dim_hora = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="dim_hora"]}[Data]
+					in
+					    Tabla
+
+	table dim_inversor
+
+		column sk_inversor
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_inversor
+
+		column cod_inversor
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: cod_inversor
+
+		column nombre
+			dataType: string
+			summarizeBy: none
+			sourceColumn: nombre
+
+		column subsistema
+			dataType: string
+			summarizeBy: none
+			sourceColumn: subsistema
+
+		column bateria_ah
+			dataType: double
+			summarizeBy: none
+			sourceColumn: bateria_ah
+
+		column bateria_kwh
+			dataType: double
+			summarizeBy: none
+			sourceColumn: bateria_kwh
+
+		column capacidad_supuesta
+			dataType: boolean
+			summarizeBy: none
+			sourceColumn: capacidad_supuesta
+
+		column max_red_w
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: max_red_w
+
+		column prioridad_carga
+			dataType: string
+			summarizeBy: none
+			sourceColumn: prioridad_carga
+
+		column soc_alarma_pct
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: soc_alarma_pct
+
+		column valido_desde
+			dataType: dateTime
+			isHidden
+			summarizeBy: none
+			sourceColumn: valido_desde
+
+		column valido_hasta
+			dataType: dateTime
+			isHidden
+			summarizeBy: none
+			sourceColumn: valido_hasta
+
+		column es_actual
+			dataType: boolean
+			summarizeBy: none
+			sourceColumn: es_actual
+
+		partition dim_inversor = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="dim_inversor"]}[Data]
+					in
+					    Tabla
+
+	table dim_tipo_evento
+
+		column sk_tipo_evento
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_tipo_evento
+
+		column cod_evento
+			dataType: string
+			summarizeBy: none
+			sourceColumn: cod_evento
+
+		column nombre
+			dataType: string
+			summarizeBy: none
+			sourceColumn: nombre
+
+		column categoria
+			dataType: string
+			summarizeBy: none
+			sourceColumn: categoria
+
+		column severidad
+			dataType: string
+			summarizeBy: none
+			sourceColumn: severidad
+
+		column origen
+			dataType: string
+			summarizeBy: none
+			sourceColumn: origen
+
+		column regla
+			dataType: string
+			summarizeBy: none
+			sourceColumn: regla
+
+		hierarchy 'Evento'
+			level 'Categoría'
+				ordinal: 0
+				column: categoria
+			level 'Tipo'
+				ordinal: 1
+				column: nombre
+
+		partition dim_tipo_evento = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="dim_tipo_evento"]}[Data]
+					in
+					    Tabla
+
+	table dim_tipo_contexto
+
+		column sk_tipo_contexto
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_tipo_contexto
+
+		column tipo_contexto
+			dataType: string
+			summarizeBy: none
+			sourceColumn: tipo_contexto
+
+		column fuente
+			dataType: string
+			summarizeBy: none
+			sourceColumn: fuente
+
+		column categoria
+			dataType: string
+			summarizeBy: none
+			sourceColumn: categoria
+
+		column es_carga
+			dataType: boolean
+			summarizeBy: none
+			sourceColumn: es_carga
+
+		hierarchy 'Contexto'
+			level 'Categoría'
+				ordinal: 0
+				column: categoria
+			level 'Tipo'
+				ordinal: 1
+				column: tipo_contexto
+
+		partition dim_tipo_contexto = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="dim_tipo_contexto"]}[Data]
+					in
+					    Tabla
+
+	table dim_dispositivo
+
+		column sk_dispositivo
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_dispositivo
+
+		column dispositivo
+			dataType: string
+			summarizeBy: none
+			sourceColumn: dispositivo
+
+		column tipo
+			dataType: string
+			summarizeBy: none
+			sourceColumn: tipo
+
+		partition dim_dispositivo = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="dim_dispositivo"]}[Data]
+					in
+					    Tabla
+
+	table fact_energia_hora
+
+		column sk_fecha
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_fecha
+
+		column sk_hora
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_hora
+
+		column sk_inversor
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_inversor
+
+		column ts_hora_utc
+			dataType: dateTime
+			isHidden
+			summarizeBy: none
+			sourceColumn: ts_hora_utc
+
+		column e_solar_kwh
+			dataType: double
+			isHidden
+			summarizeBy: sum
+			sourceColumn: e_solar_kwh
+
+		column e_carga_kwh
+			dataType: double
+			isHidden
+			summarizeBy: sum
+			sourceColumn: e_carga_kwh
+
+		column e_red_kwh
+			dataType: double
+			isHidden
+			summarizeBy: sum
+			sourceColumn: e_red_kwh
+
+		column e_bat_carga_kwh
+			dataType: double
+			isHidden
+			summarizeBy: sum
+			sourceColumn: e_bat_carga_kwh
+
+		column e_bat_descarga_kwh
+			dataType: double
+			isHidden
+			summarizeBy: sum
+			sourceColumn: e_bat_descarga_kwh
+
+		column soc_prom_pct
+			dataType: double
+			isHidden
+			summarizeBy: none
+			sourceColumn: soc_prom_pct
+
+		column soc_min_pct
+			dataType: double
+			isHidden
+			summarizeBy: none
+			sourceColumn: soc_min_pct
+
+		column minutos_con_dato
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: minutos_con_dato
+
+		column minutos_red_ok
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: minutos_red_ok
+
+		column lecturas_total
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: lecturas_total
+
+		column lecturas_validas
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: lecturas_validas
+
+		partition fact_energia_hora = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="fact_energia_hora"]}[Data]
+					in
+					    Tabla
+
+	table fact_evento
+
+		column id_evento
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: id_evento
+
+		column sk_tipo_evento
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_tipo_evento
+
+		column sk_inversor
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_inversor
+
+		column sk_fecha
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_fecha
+
+		column sk_hora
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_hora
+
+		column inicio_utc
+			dataType: dateTime
+			summarizeBy: none
+			sourceColumn: inicio_utc
+
+		column fin_utc
+			dataType: dateTime
+			summarizeBy: none
+			sourceColumn: fin_utc
+
+		column duracion_min
+			dataType: double
+			summarizeBy: none
+			sourceColumn: duracion_min
+
+		column valor_extremo
+			dataType: double
+			summarizeBy: none
+			sourceColumn: valor_extremo
+
+		column descripcion
+			dataType: string
+			summarizeBy: none
+			sourceColumn: descripcion
+
+		partition fact_evento = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="fact_evento"]}[Data]
+					in
+					    Tabla
+
+	table fact_actividad
+
+		column id_contexto
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: id_contexto
+
+		column sk_tipo_contexto
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_tipo_contexto
+
+		column sk_dispositivo
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_dispositivo
+
+		column sk_inversor
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_inversor
+
+		column sk_fecha
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_fecha
+
+		column sk_hora
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_hora
+
+		column inicio_utc
+			dataType: dateTime
+			summarizeBy: none
+			sourceColumn: inicio_utc
+
+		column fin_utc
+			dataType: dateTime
+			summarizeBy: none
+			sourceColumn: fin_utc
+
+		column duracion_min
+			dataType: double
+			summarizeBy: none
+			sourceColumn: duracion_min
+
+		column nucleos_cpu
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: nucleos_cpu
+
+		column es_gpu
+			dataType: boolean
+			summarizeBy: none
+			sourceColumn: es_gpu
+
+		column carga_estimada
+			dataType: string
+			summarizeBy: none
+			sourceColumn: carga_estimada
+
+		partition fact_actividad = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="fact_actividad"]}[Data]
+					in
+					    Tabla
+
+	table fact_contador_diario
+
+		column sk_fecha
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_fecha
+
+		column sk_inversor
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: sk_inversor
+
+		column pv_kwh
+			dataType: double
+			summarizeBy: none
+			sourceColumn: pv_kwh
+
+		column carga_kwh
+			dataType: double
+			summarizeBy: none
+			sourceColumn: carga_kwh
+
+		column carga_desde_red_kwh
+			dataType: double
+			summarizeBy: none
+			sourceColumn: carga_desde_red_kwh
+
+		column bat_carga_kwh
+			dataType: double
+			summarizeBy: none
+			sourceColumn: bat_carga_kwh
+
+		column bat_descarga_kwh
+			dataType: double
+			summarizeBy: none
+			sourceColumn: bat_descarga_kwh
+
+		partition fact_contador_diario = m
+			mode: import
+			source =
+					let
+					    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+					    Tabla = Origen{[Schema="gold",Item="fact_contador_diario"]}[Data]
+					in
+					    Tabla
+
+	table 'Tarifa'
+
+		column 'Tarifa COP por kWh'
+			dataType: double
+			formatString: #,0
+			summarizeBy: none
+			sourceColumn: [Value]
+
+		partition 'Tarifa' = calculated
+			mode: import
+			source = GENERATESERIES ( 500, 1500, 10 )
+
+	table 'Paneles adicionales'
+
+		column 'Paneles adicionales %'
+			dataType: double
+			formatString: 0%
+			summarizeBy: none
+			sourceColumn: [Value]
+
+		partition 'Paneles adicionales' = calculated
+			mode: import
+			source = GENERATESERIES ( 0, 1, 0.05 )
+
+	table Balance
+
+		column Lado
+			dataType: string
+			summarizeBy: none
+			sourceColumn: [Lado]
+
+		column Componente
+			dataType: string
+			summarizeBy: none
+			sortByColumn: Orden
+			sourceColumn: [Componente]
+
+		column Orden
+			dataType: int64
+			isHidden
+			summarizeBy: none
+			sourceColumn: [Orden]
+
+		partition Balance = calculated
+			mode: import
+			source = ```
+				DATATABLE ( "Lado", STRING, "Componente", STRING, "Orden", INTEGER, {
+					{ "1 · De dónde viene", "Sol", 1 }, { "1 · De dónde viene", "Red pública", 2 }, { "1 · De dónde viene", "Batería (descarga)", 3 },
+					{ "2 · A dónde va", "Carga (equipos)", 4 }, { "2 · A dónde va", "Batería (carga)", 5 }, { "2 · A dónde va", "Pérdidas de conversión", 6 } } )
+				```
+
+	table _Medidas
+
+		measure 'Energía Solar (kWh)' = SUM ( fact_energia_hora[e_solar_kwh] )
+			formatString: #,0.0
+			displayFolder: 1 Energía
+
+		measure 'Energía a la Carga (kWh)' = SUM ( fact_energia_hora[e_carga_kwh] )
+			formatString: #,0.0
+			displayFolder: 1 Energía
+
+		measure 'Energía de la Red (kWh)' = SUM ( fact_energia_hora[e_red_kwh] )
+			formatString: #,0.0
+			displayFolder: 1 Energía
+
+		measure 'Batería Carga (kWh)' = SUM ( fact_energia_hora[e_bat_carga_kwh] )
+			formatString: #,0.0
+			displayFolder: 1 Energía
+
+		measure 'Batería Descarga (kWh)' = SUM ( fact_energia_hora[e_bat_descarga_kwh] )
+			formatString: #,0.0
+			displayFolder: 1 Energía
+
+		measure 'Pérdidas de Conversión (kWh)' = MAX ( 0, [Energía Solar (kWh)] + [Energía de la Red (kWh)] + [Batería Descarga (kWh)] - [Energía a la Carga (kWh)] - [Batería Carga (kWh)] )
+			formatString: #,0.0
+			displayFolder: 1 Energía
+
+		measure 'Autosuficiencia' = 1 - DIVIDE ( MIN ( [Energía de la Red (kWh)], [Energía a la Carga (kWh)] ), [Energía a la Carga (kWh)] )
+			formatString: 0.0%
+			displayFolder: 2 Balance
+
+		measure 'Fracción Solar' = DIVIDE ( [Energía Solar (kWh)], [Energía Solar (kWh)] + [Energía de la Red (kWh)] )
+			formatString: 0.0%
+			displayFolder: 2 Balance
+
+		measure 'Dependencia de la Red' = DIVIDE ( [Energía de la Red (kWh)], [Energía Solar (kWh)] + [Energía de la Red (kWh)] )
+			formatString: 0.0%
+			displayFolder: 2 Balance
+
+		measure 'Eficiencia del Sistema' = DIVIDE ( [Energía a la Carga (kWh)], [Energía Solar (kWh)] + [Energía de la Red (kWh)] )
+			formatString: 0.0%
+			displayFolder: 2 Balance
+
+		measure 'Balance (kWh)' = ```
+				SWITCH ( SELECTEDVALUE ( Balance[Componente] ),
+				    "Sol", [Energía Solar (kWh)],
+				    "Red pública", [Energía de la Red (kWh)],
+				    "Batería (descarga)", [Batería Descarga (kWh)],
+				    "Carga (equipos)", [Energía a la Carga (kWh)],
+				    "Batería (carga)", [Batería Carga (kWh)],
+				    "Pérdidas de conversión", [Pérdidas de Conversión (kWh)] )
+				```
+			formatString: #,0.0
+			displayFolder: 2 Balance
+
+		measure 'Ciclos Equivalentes' = ```
+				SUMX ( VALUES ( dim_inversor[cod_inversor] ),
+				    DIVIDE ( CALCULATE ( [Batería Descarga (kWh)] ), CALCULATE ( MAX ( dim_inversor[bateria_kwh] ) ) ) )
+				```
+			formatString: #,0.0
+			displayFolder: 3 Batería
+
+		measure 'SoC Promedio' = AVERAGE ( fact_energia_hora[soc_prom_pct] ) / 100
+			formatString: 0.0%
+			displayFolder: 3 Batería
+
+		measure 'SoC Mínimo' = MIN ( fact_energia_hora[soc_min_pct] ) / 100
+			formatString: 0.0%
+			displayFolder: 3 Batería
+
+		measure 'Tarifa Seleccionada' = SELECTEDVALUE ( Tarifa[Tarifa COP por kWh], 991.29 )
+			formatString: #,0.00
+			displayFolder: 4 Economía
+
+		measure 'Ahorro Solar (COP)' = [Energía Solar (kWh)] * [Tarifa Seleccionada]
+			formatString: $ #,0
+			displayFolder: 4 Economía
+
+		measure 'Costo de la Red (COP)' = [Energía de la Red (kWh)] * [Tarifa Seleccionada]
+			formatString: $ #,0
+			displayFolder: 4 Economía
+
+		measure 'Paneles Adicionales Seleccionados' = SELECTEDVALUE ( 'Paneles adicionales'[Paneles adicionales %], 0 )
+			formatString: 0%
+			displayFolder: 4 Economía
+
+		measure 'Energía Solar Escenario (kWh)' = [Energía Solar (kWh)] * ( 1 + [Paneles Adicionales Seleccionados] )
+			formatString: #,0.0
+			displayFolder: 4 Economía
+
+		measure 'Ahorro Escenario (COP)' = MIN ( [Energía Solar Escenario (kWh)], [Energía a la Carga (kWh)] + [Batería Carga (kWh)] ) * [Tarifa Seleccionada]
+			formatString: $ #,0
+			displayFolder: 4 Economía
+
+		measure 'Horas Posibles' = CALCULATE ( COUNTROWS ( dim_fecha ), dim_fecha[con_telemetria] = TRUE () ) * 24 * CALCULATE ( DISTINCTCOUNT ( dim_inversor[cod_inversor] ), dim_inversor[cod_inversor] > 0 )
+			formatString: #,0
+			displayFolder: 5 Calidad de datos
+
+		measure 'Disponibilidad del Registro' = DIVIDE ( SUM ( fact_energia_hora[minutos_con_dato] ) / 60, [Horas Posibles] )
+			formatString: 0.0%
+			displayFolder: 5 Calidad de datos
+
+		measure '% Datos Válidos' = DIVIDE ( SUM ( fact_energia_hora[lecturas_validas] ), SUM ( fact_energia_hora[lecturas_total] ) )
+			formatString: 0.00%
+			displayFolder: 5 Calidad de datos
+
+		measure 'Horas con Red Disponible' = SUM ( fact_energia_hora[minutos_red_ok] ) / 60
+			formatString: #,0
+			displayFolder: 5 Calidad de datos
+
+		measure 'Eventos' = COUNTROWS ( fact_evento )
+			formatString: #,0
+			displayFolder: 6 Eventos
+
+		measure 'Horas en Evento' = SUM ( fact_evento[duracion_min] ) / 60
+			formatString: #,0.0
+			displayFolder: 6 Eventos
+
+		measure 'Cortes de Red' = CALCULATE ( [Eventos], dim_tipo_evento[cod_evento] = "RED_NO_DISPONIBLE" )
+			formatString: #,0
+			displayFolder: 6 Eventos
+
+		measure 'Horas sin Red' = CALCULATE ( [Horas en Evento], dim_tipo_evento[cod_evento] = "RED_NO_DISPONIBLE" )
+			formatString: #,0.0
+			displayFolder: 6 Eventos
+
+		measure 'Episodios de Batería Baja' = CALCULATE ( [Eventos], dim_tipo_evento[cod_evento] = "SOC_BAJO" )
+			formatString: #,0
+			displayFolder: 6 Eventos
+
+		measure 'Solar Mes Anterior (kWh)' = CALCULATE ( [Energía Solar (kWh)], DATEADD ( dim_fecha[fecha], -1, MONTH ) )
+			formatString: #,0.0
+			displayFolder: 7 Inteligencia de tiempo
+
+		measure 'Var Solar vs Mes Anterior' = DIVIDE ( [Energía Solar (kWh)] - [Solar Mes Anterior (kWh)], [Solar Mes Anterior (kWh)] )
+			formatString: +0.0%;-0.0%;0.0%
+			displayFolder: 7 Inteligencia de tiempo
+
+		measure 'Fracción Solar Mes Anterior' = CALCULATE ( [Fracción Solar], DATEADD ( dim_fecha[fecha], -1, MONTH ) )
+			formatString: 0.0%
+			displayFolder: 7 Inteligencia de tiempo
+
+		measure 'Solar Año Anterior (kWh)' = CALCULATE ( [Energía Solar (kWh)], SAMEPERIODLASTYEAR ( dim_fecha[fecha] ) )
+			formatString: #,0.0
+			displayFolder: 7 Inteligencia de tiempo
+
+		measure 'Solar Acumulado del Año (kWh)' = TOTALYTD ( [Energía Solar (kWh)], dim_fecha[fecha] )
+			formatString: #,0.0
+			displayFolder: 7 Inteligencia de tiempo
+
+		measure 'Fracción Solar Móvil 7 Días' = CALCULATE ( [Fracción Solar], DATESINPERIOD ( dim_fecha[fecha], MAX ( dim_fecha[fecha] ), -7, DAY ) )
+			formatString: 0.0%
+			displayFolder: 7 Inteligencia de tiempo
+
+		measure 'Registros de Contexto' = COUNTROWS ( fact_actividad )
+			formatString: #,0
+			displayFolder: 8 Actividad
+
+		measure 'Entrenamientos en GPU' = CALCULATE ( [Registros de Contexto], fact_actividad[es_gpu] = TRUE () )
+			formatString: #,0
+			displayFolder: 8 Actividad
+
+		measure 'Horas de Carga de Cómputo' = CALCULATE ( SUM ( fact_actividad[duracion_min] ) / 60, dim_tipo_contexto[es_carga] = TRUE () )
+			formatString: #,0.0
+			displayFolder: 8 Actividad
+
+		column Columna
+			dataType: int64
+			isHidden
+			isNameInferred
+			summarizeBy: none
+			sourceColumn: [Columna]
+
+		partition _Medidas = calculated
+			mode: import
+			source = ROW ( "Columna", 1 )
+
+	relationship rel_fact_energia_hora_sk_fecha
+		fromColumn: fact_energia_hora.sk_fecha
+		toColumn: dim_fecha.sk_fecha
+
+	relationship rel_fact_energia_hora_sk_hora
+		fromColumn: fact_energia_hora.sk_hora
+		toColumn: dim_hora.sk_hora
+
+	relationship rel_fact_energia_hora_sk_inversor
+		fromColumn: fact_energia_hora.sk_inversor
+		toColumn: dim_inversor.sk_inversor
+
+	relationship rel_fact_evento_sk_fecha
+		fromColumn: fact_evento.sk_fecha
+		toColumn: dim_fecha.sk_fecha
+
+	relationship rel_fact_evento_sk_hora
+		fromColumn: fact_evento.sk_hora
+		toColumn: dim_hora.sk_hora
+
+	relationship rel_fact_evento_sk_inversor
+		fromColumn: fact_evento.sk_inversor
+		toColumn: dim_inversor.sk_inversor
+
+	relationship rel_fact_evento_sk_tipo_evento
+		fromColumn: fact_evento.sk_tipo_evento
+		toColumn: dim_tipo_evento.sk_tipo_evento
+
+	relationship rel_fact_actividad_sk_fecha
+		fromColumn: fact_actividad.sk_fecha
+		toColumn: dim_fecha.sk_fecha
+
+	relationship rel_fact_actividad_sk_hora
+		fromColumn: fact_actividad.sk_hora
+		toColumn: dim_hora.sk_hora
+
+	relationship rel_fact_actividad_sk_inversor
+		fromColumn: fact_actividad.sk_inversor
+		toColumn: dim_inversor.sk_inversor
+
+	relationship rel_fact_actividad_sk_tipo_contexto
+		fromColumn: fact_actividad.sk_tipo_contexto
+		toColumn: dim_tipo_contexto.sk_tipo_contexto
+
+	relationship rel_fact_actividad_sk_dispositivo
+		fromColumn: fact_actividad.sk_dispositivo
+		toColumn: dim_dispositivo.sk_dispositivo
+
+	relationship rel_fact_contador_diario_sk_fecha
+		fromColumn: fact_contador_diario.sk_fecha
+		toColumn: dim_fecha.sk_fecha
+
+	relationship rel_fact_contador_diario_sk_inversor
+		fromColumn: fact_contador_diario.sk_inversor
+		toColumn: dim_inversor.sk_inversor

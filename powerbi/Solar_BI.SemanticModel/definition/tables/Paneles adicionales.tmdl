@@ -1,0 +1,14 @@
+table 'Paneles adicionales'
+	lineageTag: cc7a068d-d260-4046-bfc8-6f6a838ea882
+
+	column 'Paneles adicionales %'
+		dataType: double
+		formatString: 0%
+		lineageTag: 288a645c-89b8-450d-b7fe-7af577657fb3
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition 'Paneles adicionales' = calculated
+		mode: import
+		source = GENERATESERIES ( 0, 1, 0.05 )
+

@@ -1,0 +1,119 @@
+table fact_energia_hora
+	lineageTag: 595be69c-9635-47c5-857c-0f4df68763a3
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		lineageTag: 3351e4f5-fadc-4178-98e0-c4b51095f77b
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+	column sk_hora
+		dataType: int64
+		isHidden
+		lineageTag: 0b220c73-f05d-4174-a3e9-140b6b4c10b1
+		summarizeBy: none
+		sourceColumn: sk_hora
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		lineageTag: 1fa6ca90-2056-4ddf-af70-d054459930cb
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+	column ts_hora_utc
+		dataType: dateTime
+		isHidden
+		lineageTag: d4111a9c-b799-4481-a866-cedd51bae707
+		summarizeBy: none
+		sourceColumn: ts_hora_utc
+
+	column e_solar_kwh
+		dataType: double
+		isHidden
+		lineageTag: a4095f66-db2d-4af5-8146-fa413c5b635a
+		summarizeBy: sum
+		sourceColumn: e_solar_kwh
+
+	column e_carga_kwh
+		dataType: double
+		isHidden
+		lineageTag: 572dde02-4360-4536-89ef-87f8744b884d
+		summarizeBy: sum
+		sourceColumn: e_carga_kwh
+
+	column e_red_kwh
+		dataType: double
+		isHidden
+		lineageTag: a2222205-9ee3-4370-a047-3833c2dd9c63
+		summarizeBy: sum
+		sourceColumn: e_red_kwh
+
+	column e_bat_carga_kwh
+		dataType: double
+		isHidden
+		lineageTag: d887e444-fc66-4c3c-b2df-ed83cb526d86
+		summarizeBy: sum
+		sourceColumn: e_bat_carga_kwh
+
+	column e_bat_descarga_kwh
+		dataType: double
+		isHidden
+		lineageTag: f6bedbae-0441-4add-9d73-8555523baea5
+		summarizeBy: sum
+		sourceColumn: e_bat_descarga_kwh
+
+	column soc_prom_pct
+		dataType: double
+		isHidden
+		lineageTag: 873a5cc7-3d7b-4169-8b25-3bb44128f011
+		summarizeBy: none
+		sourceColumn: soc_prom_pct
+
+	column soc_min_pct
+		dataType: double
+		isHidden
+		lineageTag: 9a98d24f-e883-47af-b7b6-db266995052c
+		summarizeBy: none
+		sourceColumn: soc_min_pct
+
+	column minutos_con_dato
+		dataType: int64
+		isHidden
+		lineageTag: cb9f4532-a01b-40b4-a2e7-e9ed07c0b238
+		summarizeBy: none
+		sourceColumn: minutos_con_dato
+
+	column minutos_red_ok
+		dataType: int64
+		isHidden
+		lineageTag: 5c0b5b93-54f5-4c36-9d06-b814bcc71990
+		summarizeBy: none
+		sourceColumn: minutos_red_ok
+
+	column lecturas_total
+		dataType: int64
+		isHidden
+		lineageTag: 51b04b40-826b-46cb-bad4-be5ab98ab64d
+		summarizeBy: none
+		sourceColumn: lecturas_total
+
+	column lecturas_validas
+		dataType: int64
+		isHidden
+		lineageTag: 8adcb87a-c456-4529-bf39-b7ce2e52cf83
+		summarizeBy: none
+		sourceColumn: lecturas_validas
+
+	partition fact_energia_hora = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="fact_energia_hora"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

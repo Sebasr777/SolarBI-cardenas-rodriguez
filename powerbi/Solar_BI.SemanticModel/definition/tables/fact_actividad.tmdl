@@ -1,0 +1,92 @@
+table fact_actividad
+	lineageTag: c969cd90-44db-444a-b2bc-ba718620cff0
+
+	column id_contexto
+		dataType: int64
+		isHidden
+		lineageTag: 248467f3-6dfa-43ad-8c41-057998edfb4a
+		summarizeBy: none
+		sourceColumn: id_contexto
+
+	column sk_tipo_contexto
+		dataType: int64
+		isHidden
+		lineageTag: 0600789d-b822-4358-a19b-92064b96b922
+		summarizeBy: none
+		sourceColumn: sk_tipo_contexto
+
+	column sk_dispositivo
+		dataType: int64
+		isHidden
+		lineageTag: 27b5753c-a1ae-4b9d-ad8d-16b29b7c9f3f
+		summarizeBy: none
+		sourceColumn: sk_dispositivo
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		lineageTag: 8c344f3a-53e2-487a-b944-e1f8da2e6843
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+	column sk_fecha
+		dataType: int64
+		isHidden
+		lineageTag: 7e699d8e-c9bb-4cc9-a8e7-47fe24500f5e
+		summarizeBy: none
+		sourceColumn: sk_fecha
+
+	column sk_hora
+		dataType: int64
+		isHidden
+		lineageTag: 73009dd3-98df-4e75-88ab-78976f159d86
+		summarizeBy: none
+		sourceColumn: sk_hora
+
+	column inicio_utc
+		dataType: dateTime
+		lineageTag: 8b9b5ff4-32b1-4611-ad78-017cc3583a0a
+		summarizeBy: none
+		sourceColumn: inicio_utc
+
+	column fin_utc
+		dataType: dateTime
+		lineageTag: 97dac2e9-6d12-4121-85f5-4ca96d5c167f
+		summarizeBy: none
+		sourceColumn: fin_utc
+
+	column duracion_min
+		dataType: double
+		lineageTag: d2d44876-957d-48d8-a580-47b1a8234cc9
+		summarizeBy: none
+		sourceColumn: duracion_min
+
+	column nucleos_cpu
+		dataType: int64
+		lineageTag: 7892c17d-a188-480a-88c3-db3ddeac6cd6
+		summarizeBy: none
+		sourceColumn: nucleos_cpu
+
+	column es_gpu
+		dataType: boolean
+		lineageTag: 937fe1da-62ba-4bfe-827c-ae0a74c0c4ab
+		summarizeBy: none
+		sourceColumn: es_gpu
+
+	column carga_estimada
+		dataType: string
+		lineageTag: 98f92d2b-fc45-459d-82f7-4eb0af37231c
+		summarizeBy: none
+		sourceColumn: carga_estimada
+
+	partition fact_actividad = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="fact_actividad"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

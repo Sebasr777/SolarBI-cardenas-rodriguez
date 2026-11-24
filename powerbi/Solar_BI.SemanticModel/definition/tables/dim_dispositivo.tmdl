@@ -1,0 +1,33 @@
+table dim_dispositivo
+	lineageTag: 25c3ca93-cbf7-4e5c-abf1-d933a49b2d5f
+
+	column sk_dispositivo
+		dataType: int64
+		isHidden
+		lineageTag: 24926c64-0e36-492c-a3d0-6b82d883c15d
+		summarizeBy: none
+		sourceColumn: sk_dispositivo
+
+	column dispositivo
+		dataType: string
+		lineageTag: 009a294b-9b7a-4648-bd42-de9a6cb87fc9
+		summarizeBy: none
+		sourceColumn: dispositivo
+
+	column tipo
+		dataType: string
+		lineageTag: 3e6048fd-b417-49ce-b507-122d61ba1e59
+		summarizeBy: none
+		sourceColumn: tipo
+
+	partition dim_dispositivo = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="dim_dispositivo"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,56 @@
+table dim_tipo_contexto
+	lineageTag: 63b0f9dd-9b57-4dc3-ba11-692daddd7bfe
+
+	column sk_tipo_contexto
+		dataType: int64
+		isHidden
+		lineageTag: 9abbf88d-ed6d-499e-bb49-1c7f6e24cc56
+		summarizeBy: none
+		sourceColumn: sk_tipo_contexto
+
+	column tipo_contexto
+		dataType: string
+		lineageTag: eabaff99-6afe-47d0-9216-5e5ef6c25514
+		summarizeBy: none
+		sourceColumn: tipo_contexto
+
+	column fuente
+		dataType: string
+		lineageTag: 9a5a6c70-b3db-4f7c-b040-332ff6113758
+		summarizeBy: none
+		sourceColumn: fuente
+
+	column categoria
+		dataType: string
+		lineageTag: 4faf50e4-c7f7-499a-b409-487e0a0d6474
+		summarizeBy: none
+		sourceColumn: categoria
+
+	column es_carga
+		dataType: boolean
+		lineageTag: d220c026-0c5c-43e1-aa88-5369d1d02da6
+		summarizeBy: none
+		sourceColumn: es_carga
+
+	hierarchy Contexto
+		lineageTag: a1f6fa05-86a2-42ff-a394-9b46aca80930
+
+		level Categoría
+			lineageTag: c94d7bac-e0f6-439f-a2c0-e9c1cea8105c
+			column: categoria
+
+		level Tipo
+			lineageTag: 945f7d42-1cae-4617-bb05-b4bd82c4b9e6
+			column: tipo_contexto
+
+	partition dim_tipo_contexto = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="dim_tipo_contexto"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

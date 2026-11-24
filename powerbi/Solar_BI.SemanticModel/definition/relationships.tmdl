@@ -1,0 +1,56 @@
+relationship rel_fact_energia_hora_sk_fecha
+	fromColumn: fact_energia_hora.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship rel_fact_energia_hora_sk_hora
+	fromColumn: fact_energia_hora.sk_hora
+	toColumn: dim_hora.sk_hora
+
+relationship rel_fact_energia_hora_sk_inversor
+	fromColumn: fact_energia_hora.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship rel_fact_evento_sk_fecha
+	fromColumn: fact_evento.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship rel_fact_evento_sk_hora
+	fromColumn: fact_evento.sk_hora
+	toColumn: dim_hora.sk_hora
+
+relationship rel_fact_evento_sk_inversor
+	fromColumn: fact_evento.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship rel_fact_evento_sk_tipo_evento
+	fromColumn: fact_evento.sk_tipo_evento
+	toColumn: dim_tipo_evento.sk_tipo_evento
+
+relationship rel_fact_actividad_sk_fecha
+	fromColumn: fact_actividad.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship rel_fact_actividad_sk_hora
+	fromColumn: fact_actividad.sk_hora
+	toColumn: dim_hora.sk_hora
+
+relationship rel_fact_actividad_sk_inversor
+	fromColumn: fact_actividad.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+
+relationship rel_fact_actividad_sk_tipo_contexto
+	fromColumn: fact_actividad.sk_tipo_contexto
+	toColumn: dim_tipo_contexto.sk_tipo_contexto
+
+relationship rel_fact_actividad_sk_dispositivo
+	fromColumn: fact_actividad.sk_dispositivo
+	toColumn: dim_dispositivo.sk_dispositivo
+
+relationship rel_fact_contador_diario_sk_fecha
+	fromColumn: fact_contador_diario.sk_fecha
+	toColumn: dim_fecha.sk_fecha
+
+relationship rel_fact_contador_diario_sk_inversor
+	fromColumn: fact_contador_diario.sk_inversor
+	toColumn: dim_inversor.sk_inversor
+

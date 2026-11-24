@@ -1,0 +1,62 @@
+table dim_hora
+	lineageTag: 76ae6b45-3685-41e8-a139-8de26d3bf764
+
+	column sk_hora
+		dataType: int64
+		isHidden
+		lineageTag: 76988034-c076-4034-a3cb-b0bd86aaca8f
+		summarizeBy: none
+		sourceColumn: sk_hora
+
+	column hora
+		dataType: int64
+		lineageTag: 85210149-2223-423b-9254-8b838bbe2f2d
+		summarizeBy: none
+		sourceColumn: hora
+
+	column etiqueta
+		dataType: string
+		lineageTag: 94dd0296-2b9c-4662-ac00-2f9cfec335d2
+		summarizeBy: none
+		sourceColumn: etiqueta
+
+	column franja
+		dataType: string
+		lineageTag: 9eb2a464-dc15-4b1a-b4b4-86119f8e67f5
+		summarizeBy: none
+		sourceColumn: franja
+
+	column periodo_solar
+		dataType: string
+		lineageTag: a61239b2-c99f-44c5-9f4c-34932861ef66
+		summarizeBy: none
+		sourceColumn: periodo_solar
+
+	column franja_tarifaria
+		dataType: string
+		lineageTag: ca4ee2a2-7b81-46ab-87cb-8ad081334764
+		summarizeBy: none
+		sourceColumn: franja_tarifaria
+
+	hierarchy 'Día solar'
+		lineageTag: 68e85b4f-5e14-494d-8dea-ef87d7703f85
+
+		level Franja
+			lineageTag: 97e04a3d-2550-431f-9fee-70e87ba3d770
+			column: franja
+
+		level Hora
+			lineageTag: 93f5c2eb-231e-49ed-93cb-5c2cdf0d7df2
+			column: etiqueta
+
+	partition dim_hora = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="dim_hora"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

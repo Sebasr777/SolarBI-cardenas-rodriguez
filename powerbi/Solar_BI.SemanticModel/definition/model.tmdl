@@ -1,0 +1,32 @@
+model Model
+	culture: es-CO
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: es-CO
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["TMDLView_Desktop","DevMode"]
+
+annotation PBI_QueryOrder = ["dim_fecha","dim_hora","dim_inversor","dim_tipo_evento","dim_tipo_contexto","dim_dispositivo","fact_energia_hora","fact_evento","fact_actividad","fact_contador_diario","ServidorPostgres","BaseDatos"]
+
+ref table dim_fecha
+ref table dim_hora
+ref table dim_inversor
+ref table dim_tipo_evento
+ref table dim_tipo_contexto
+ref table dim_dispositivo
+ref table fact_energia_hora
+ref table fact_evento
+ref table fact_actividad
+ref table fact_contador_diario
+ref table Tarifa
+ref table 'Paneles adicionales'
+ref table Balance
+ref table _Medidas
+
+ref cultureInfo es-CO
+

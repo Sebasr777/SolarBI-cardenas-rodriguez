@@ -1,0 +1,95 @@
+table dim_inversor
+	lineageTag: e3ac98b0-7cb0-4bc1-9086-2707784c5a30
+
+	column sk_inversor
+		dataType: int64
+		isHidden
+		lineageTag: 98703679-db98-43e7-bef6-b2e95c766402
+		summarizeBy: none
+		sourceColumn: sk_inversor
+
+	column cod_inversor
+		dataType: int64
+		lineageTag: e56c7fbe-11e3-4859-8b71-788544b7f8c0
+		summarizeBy: none
+		sourceColumn: cod_inversor
+
+	column nombre
+		dataType: string
+		lineageTag: 2b660160-32c4-492a-ae94-cb6d3efc6778
+		summarizeBy: none
+		sourceColumn: nombre
+
+	column subsistema
+		dataType: string
+		lineageTag: ad255330-8b1f-4e20-84d2-7ff7725e1672
+		summarizeBy: none
+		sourceColumn: subsistema
+
+	column bateria_ah
+		dataType: double
+		lineageTag: 3fa826b6-e208-4724-b4fc-c4011b97a7e0
+		summarizeBy: none
+		sourceColumn: bateria_ah
+
+	column bateria_kwh
+		dataType: double
+		lineageTag: fe96ff03-952e-4b82-838d-92daefd963fc
+		summarizeBy: none
+		sourceColumn: bateria_kwh
+
+	column capacidad_supuesta
+		dataType: boolean
+		lineageTag: b9890789-d822-4d9d-8ec0-abb50f4e65ef
+		summarizeBy: none
+		sourceColumn: capacidad_supuesta
+
+	column max_red_w
+		dataType: int64
+		lineageTag: bb501ea4-faee-43a6-8b17-3ebed8fc8e83
+		summarizeBy: none
+		sourceColumn: max_red_w
+
+	column prioridad_carga
+		dataType: string
+		lineageTag: 82dd2fa6-07d2-4081-903e-fb328ae63249
+		summarizeBy: none
+		sourceColumn: prioridad_carga
+
+	column soc_alarma_pct
+		dataType: int64
+		lineageTag: 08883443-f382-4e66-b84b-b2b821e3581f
+		summarizeBy: none
+		sourceColumn: soc_alarma_pct
+
+	column valido_desde
+		dataType: dateTime
+		isHidden
+		lineageTag: caf64da9-3a45-44be-af3d-53acc5fd7622
+		summarizeBy: none
+		sourceColumn: valido_desde
+
+	column valido_hasta
+		dataType: dateTime
+		isHidden
+		lineageTag: da4bbee7-edeb-4a07-9452-fb11697d3eb4
+		summarizeBy: none
+		sourceColumn: valido_hasta
+
+	column es_actual
+		dataType: boolean
+		lineageTag: ac1ae89e-70e3-4b85-a94f-1b55b1facf3d
+		summarizeBy: none
+		sourceColumn: es_actual
+
+	partition dim_inversor = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="dim_inversor"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+

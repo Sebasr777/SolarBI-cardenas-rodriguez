@@ -1,0 +1,214 @@
+table _Medidas
+	lineageTag: 8ca69484-ec4f-4057-b5aa-190d17b41526
+
+	measure 'Energía Solar (kWh)' = SUM ( fact_energia_hora[e_solar_kwh] )
+		formatString: #,0.0
+		displayFolder: 1 Energía
+		lineageTag: ce75d73f-223d-428f-851c-364701e42087
+
+	measure 'Energía a la Carga (kWh)' = SUM ( fact_energia_hora[e_carga_kwh] )
+		formatString: #,0.0
+		displayFolder: 1 Energía
+		lineageTag: 8333d2ea-24b8-47c9-8150-47a832f648f6
+
+	measure 'Energía de la Red (kWh)' = SUM ( fact_energia_hora[e_red_kwh] )
+		formatString: #,0.0
+		displayFolder: 1 Energía
+		lineageTag: d16d8a80-996a-4951-b611-d58e4ad146af
+
+	measure 'Batería Carga (kWh)' = SUM ( fact_energia_hora[e_bat_carga_kwh] )
+		formatString: #,0.0
+		displayFolder: 1 Energía
+		lineageTag: cf3e4f74-5870-4001-bdc9-19e85f7fb360
+
+	measure 'Batería Descarga (kWh)' = SUM ( fact_energia_hora[e_bat_descarga_kwh] )
+		formatString: #,0.0
+		displayFolder: 1 Energía
+		lineageTag: 68c7d012-6856-43a2-9e70-6bf92d080f1d
+
+	measure 'Pérdidas de Conversión (kWh)' = MAX ( 0, [Energía Solar (kWh)] + [Energía de la Red (kWh)] + [Batería Descarga (kWh)] - [Energía a la Carga (kWh)] - [Batería Carga (kWh)] )
+		formatString: #,0.0
+		displayFolder: 1 Energía
+		lineageTag: ff5c5fae-639d-4ab8-812f-1fc1db423afb
+
+	measure Autosuficiencia = 1 - DIVIDE ( MIN ( [Energía de la Red (kWh)], [Energía a la Carga (kWh)] ), [Energía a la Carga (kWh)] )
+		formatString: 0.0%
+		displayFolder: 2 Balance
+		lineageTag: 22a438ed-596a-440f-9468-629be41a32a2
+
+	measure 'Fracción Solar' = DIVIDE ( [Energía Solar (kWh)], [Energía Solar (kWh)] + [Energía de la Red (kWh)] )
+		formatString: 0.0%
+		displayFolder: 2 Balance
+		lineageTag: ee73e0ba-c2ec-4769-be10-b3567172c7bc
+
+	measure 'Dependencia de la Red' = DIVIDE ( [Energía de la Red (kWh)], [Energía Solar (kWh)] + [Energía de la Red (kWh)] )
+		formatString: 0.0%
+		displayFolder: 2 Balance
+		lineageTag: 21b63456-7524-4c1f-a173-c9bfcfa52cab
+
+	measure 'Eficiencia del Sistema' = DIVIDE ( [Energía a la Carga (kWh)], [Energía Solar (kWh)] + [Energía de la Red (kWh)] )
+		formatString: 0.0%
+		displayFolder: 2 Balance
+		lineageTag: 65e76920-fdfe-4797-9014-21c7ad5d9b36
+
+	measure 'Balance (kWh)' =
+			SWITCH ( SELECTEDVALUE ( Balance[Componente] ),
+			    "Sol", [Energía Solar (kWh)],
+			    "Red pública", [Energía de la Red (kWh)],
+			    "Batería (descarga)", [Batería Descarga (kWh)],
+			    "Carga (equipos)", [Energía a la Carga (kWh)],
+			    "Batería (carga)", [Batería Carga (kWh)],
+			    "Pérdidas de conversión", [Pérdidas de Conversión (kWh)] )
+		formatString: #,0.0
+		displayFolder: 2 Balance
+		lineageTag: 11e0638b-8880-4806-96cf-4e7a999f5dab
+
+	measure 'Ciclos Equivalentes' =
+			SUMX ( VALUES ( dim_inversor[cod_inversor] ),
+			    DIVIDE ( CALCULATE ( [Batería Descarga (kWh)] ), CALCULATE ( MAX ( dim_inversor[bateria_kwh] ) ) ) )
+		formatString: #,0.0
+		displayFolder: 3 Batería
+		lineageTag: 05d43819-2a16-4c68-aace-ee4f8ddcd5e9
+
+	measure 'SoC Promedio' = AVERAGE ( fact_energia_hora[soc_prom_pct] ) / 100
+		formatString: 0.0%
+		displayFolder: 3 Batería
+		lineageTag: 9d5cace8-ffac-4e25-af52-11c09544e5ac
+
+	measure 'SoC Mínimo' = MIN ( fact_energia_hora[soc_min_pct] ) / 100
+		formatString: 0.0%
+		displayFolder: 3 Batería
+		lineageTag: 29820541-5366-4bf4-b33d-12749075a549
+
+	measure 'Tarifa Seleccionada' = SELECTEDVALUE ( Tarifa[Tarifa COP por kWh], 991.29 )
+		formatString: #,0.00
+		displayFolder: 4 Economía
+		lineageTag: 7c236a98-2f12-4683-843b-727f713084bc
+
+	measure 'Ahorro Solar (COP)' = [Energía Solar (kWh)] * [Tarifa Seleccionada]
+		formatString: $ #,0
+		displayFolder: 4 Economía
+		lineageTag: 304368a0-eba5-4445-8893-9bf85171a5b3
+
+	measure 'Costo de la Red (COP)' = [Energía de la Red (kWh)] * [Tarifa Seleccionada]
+		formatString: $ #,0
+		displayFolder: 4 Economía
+		lineageTag: 5e504ba8-bdd0-4955-9229-e1a7f7a81748
+
+	measure 'Paneles Adicionales Seleccionados' = SELECTEDVALUE ( 'Paneles adicionales'[Paneles adicionales %], 0 )
+		formatString: 0%
+		displayFolder: 4 Economía
+		lineageTag: 2594000a-8fc9-41f9-b2bd-afb284beff98
+
+	measure 'Energía Solar Escenario (kWh)' = [Energía Solar (kWh)] * ( 1 + [Paneles Adicionales Seleccionados] )
+		formatString: #,0.0
+		displayFolder: 4 Economía
+		lineageTag: 11ea18d6-c19b-4673-b0d6-ae5ec9f4f4ea
+
+	measure 'Ahorro Escenario (COP)' = MIN ( [Energía Solar Escenario (kWh)], [Energía a la Carga (kWh)] + [Batería Carga (kWh)] ) * [Tarifa Seleccionada]
+		formatString: $ #,0
+		displayFolder: 4 Economía
+		lineageTag: 5e47ea56-d391-4a3b-b437-c67b6283e85e
+
+	measure 'Horas Posibles' = CALCULATE ( COUNTROWS ( dim_fecha ), dim_fecha[con_telemetria] = TRUE () ) * 24 * CALCULATE ( DISTINCTCOUNT ( dim_inversor[cod_inversor] ), dim_inversor[cod_inversor] > 0 )
+		formatString: #,0
+		displayFolder: 5 Calidad de datos
+		lineageTag: da0486e3-3479-4d73-bc10-6cd353419156
+
+	measure 'Disponibilidad del Registro' = DIVIDE ( SUM ( fact_energia_hora[minutos_con_dato] ) / 60, [Horas Posibles] )
+		formatString: 0.0%
+		displayFolder: 5 Calidad de datos
+		lineageTag: 9eacb8a1-a616-41e6-874e-7abc1e582443
+
+	measure '% Datos Válidos' = DIVIDE ( SUM ( fact_energia_hora[lecturas_validas] ), SUM ( fact_energia_hora[lecturas_total] ) )
+		formatString: 0.00%
+		displayFolder: 5 Calidad de datos
+		lineageTag: 2a8e2d2b-9cf5-4f5c-980c-a5837e1a0871
+
+	measure 'Horas con Red Disponible' = SUM ( fact_energia_hora[minutos_red_ok] ) / 60
+		formatString: #,0
+		displayFolder: 5 Calidad de datos
+		lineageTag: 7034326f-609f-48b0-9530-d1379f896717
+
+	measure Eventos = COUNTROWS ( fact_evento )
+		formatString: #,0
+		displayFolder: 6 Eventos
+		lineageTag: 8f1fa7d9-4d16-4276-a3b7-3989c25aa683
+
+	measure 'Horas en Evento' = SUM ( fact_evento[duracion_min] ) / 60
+		formatString: #,0.0
+		displayFolder: 6 Eventos
+		lineageTag: f7b60773-baa0-45a9-b14c-a19a4b47d2ae
+
+	measure 'Cortes de Red' = CALCULATE ( [Eventos], dim_tipo_evento[cod_evento] = "RED_NO_DISPONIBLE" )
+		formatString: #,0
+		displayFolder: 6 Eventos
+		lineageTag: 311a75e0-5e26-47f5-962f-51043d320169
+
+	measure 'Horas sin Red' = CALCULATE ( [Horas en Evento], dim_tipo_evento[cod_evento] = "RED_NO_DISPONIBLE" )
+		formatString: #,0.0
+		displayFolder: 6 Eventos
+		lineageTag: 7f284af6-b51e-40d8-bff7-cc5c3a456452
+
+	measure 'Episodios de Batería Baja' = CALCULATE ( [Eventos], dim_tipo_evento[cod_evento] = "SOC_BAJO" )
+		formatString: #,0
+		displayFolder: 6 Eventos
+		lineageTag: 60059e65-678d-4198-9a0f-8bf851e4056e
+
+	measure 'Solar Mes Anterior (kWh)' = CALCULATE ( [Energía Solar (kWh)], DATEADD ( dim_fecha[fecha], -1, MONTH ) )
+		formatString: #,0.0
+		displayFolder: 7 Inteligencia de tiempo
+		lineageTag: 860568b3-1efb-47d3-ae83-99a27b7a8ad6
+
+	measure 'Var Solar vs Mes Anterior' = DIVIDE ( [Energía Solar (kWh)] - [Solar Mes Anterior (kWh)], [Solar Mes Anterior (kWh)] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 7 Inteligencia de tiempo
+		lineageTag: 92420f9a-4f8a-4dab-9eac-2486788a6956
+
+	measure 'Fracción Solar Mes Anterior' = CALCULATE ( [Fracción Solar], DATEADD ( dim_fecha[fecha], -1, MONTH ) )
+		formatString: 0.0%
+		displayFolder: 7 Inteligencia de tiempo
+		lineageTag: c0fd5441-2008-4103-acc2-5e8d53d239a0
+
+	measure 'Solar Año Anterior (kWh)' = CALCULATE ( [Energía Solar (kWh)], SAMEPERIODLASTYEAR ( dim_fecha[fecha] ) )
+		formatString: #,0.0
+		displayFolder: 7 Inteligencia de tiempo
+		lineageTag: 2f0edbfb-6bc1-489a-8982-db1eee5f4657
+
+	measure 'Solar Acumulado del Año (kWh)' = TOTALYTD ( [Energía Solar (kWh)], dim_fecha[fecha] )
+		formatString: #,0.0
+		displayFolder: 7 Inteligencia de tiempo
+		lineageTag: fef9ba3c-4191-43ec-a37e-52a2943c2052
+
+	measure 'Fracción Solar Móvil 7 Días' = CALCULATE ( [Fracción Solar], DATESINPERIOD ( dim_fecha[fecha], MAX ( dim_fecha[fecha] ), -7, DAY ) )
+		formatString: 0.0%
+		displayFolder: 7 Inteligencia de tiempo
+		lineageTag: b27cbc53-4c04-40ea-b100-c18a9f2b6b66
+
+	measure 'Registros de Contexto' = COUNTROWS ( fact_actividad )
+		formatString: #,0
+		displayFolder: 8 Actividad
+		lineageTag: 26a0c3eb-ec4d-43b4-821f-90f960cd70c3
+
+	measure 'Entrenamientos en GPU' = CALCULATE ( [Registros de Contexto], fact_actividad[es_gpu] = TRUE () )
+		formatString: #,0
+		displayFolder: 8 Actividad
+		lineageTag: fcaf7deb-5d0b-418a-82eb-7c6234646e02
+
+	measure 'Horas de Carga de Cómputo' = CALCULATE ( SUM ( fact_actividad[duracion_min] ) / 60, dim_tipo_contexto[es_carga] = TRUE () )
+		formatString: #,0.0
+		displayFolder: 8 Actividad
+		lineageTag: cb8aa906-e1a9-4cfb-8d14-d02fd675e314
+
+	column Columna
+		dataType: int64
+		isHidden
+		lineageTag: 55eb5090-2f43-43b0-8963-03cc92e23f02
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Columna]
+
+	partition _Medidas = calculated
+		mode: import
+		source = ROW ( "Columna", 1 )
+

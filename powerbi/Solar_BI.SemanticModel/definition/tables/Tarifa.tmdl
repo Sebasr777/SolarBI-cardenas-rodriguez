@@ -1,0 +1,14 @@
+table Tarifa
+	lineageTag: 07c4730b-8fcc-42a2-a353-59a84c3b0486
+
+	column 'Tarifa COP por kWh'
+		dataType: double
+		formatString: #,0
+		lineageTag: 49ea866d-a57b-4e97-bee4-199e442d20e3
+		summarizeBy: none
+		sourceColumn: [Value]
+
+	partition Tarifa = calculated
+		mode: import
+		source = GENERATESERIES ( 500, 1500, 10 )
+

@@ -1,0 +1,68 @@
+table dim_tipo_evento
+	lineageTag: 32723fb5-db99-4f5d-9941-d73f2b5187c8
+
+	column sk_tipo_evento
+		dataType: int64
+		isHidden
+		lineageTag: ea41bffb-670d-4aa1-880e-2f4ae11fa383
+		summarizeBy: none
+		sourceColumn: sk_tipo_evento
+
+	column cod_evento
+		dataType: string
+		lineageTag: e01955ab-ee91-4426-b99a-476b8ccfae3f
+		summarizeBy: none
+		sourceColumn: cod_evento
+
+	column nombre
+		dataType: string
+		lineageTag: 400d30d4-b4d0-478e-a945-c0669f9c612b
+		summarizeBy: none
+		sourceColumn: nombre
+
+	column categoria
+		dataType: string
+		lineageTag: 3d177f3b-6768-4238-b18f-936dd71ef8d5
+		summarizeBy: none
+		sourceColumn: categoria
+
+	column severidad
+		dataType: string
+		lineageTag: bf1c7ff0-4a6c-41e5-a400-bc8f029abd1e
+		summarizeBy: none
+		sourceColumn: severidad
+
+	column origen
+		dataType: string
+		lineageTag: 2690171c-6011-4bfe-940e-35d6abb4627d
+		summarizeBy: none
+		sourceColumn: origen
+
+	column regla
+		dataType: string
+		lineageTag: 594bd175-544c-4726-9c7b-efffa2ef0443
+		summarizeBy: none
+		sourceColumn: regla
+
+	hierarchy Evento
+		lineageTag: d4457b90-c7df-4c94-ad94-43c937e3b66f
+
+		level Categoría
+			lineageTag: 42443544-068a-43c0-acc5-4e03f604584c
+			column: categoria
+
+		level Tipo
+			lineageTag: bd0d79ed-574d-4566-b633-2a4b60478790
+			column: nombre
+
+	partition dim_tipo_evento = m
+		mode: import
+		source =
+				let
+				    Origen = PostgreSQL.Database(ServidorPostgres, BaseDatos),
+				    Tabla = Origen{[Schema="gold",Item="dim_tipo_evento"]}[Data]
+				in
+				    Tabla
+
+	annotation PBI_ResultType = Table
+
