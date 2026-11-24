@@ -1,0 +1,67 @@
+erDiagram
+  dim_fecha ||--o{ fact_energia_hora : sk_fecha
+  dim_hora ||--o{ fact_energia_hora : sk_hora
+  dim_inversor ||--o{ fact_energia_hora : sk_inversor
+  dim_fecha ||--o{ fact_evento : sk_fecha
+  dim_hora ||--o{ fact_evento : sk_hora
+  dim_inversor ||--o{ fact_evento : sk_inversor
+  dim_tipo_evento ||--o{ fact_evento : sk_tipo_evento
+  dim_fecha ||--o{ fact_actividad : sk_fecha
+  dim_hora ||--o{ fact_actividad : sk_hora
+  dim_inversor ||--o{ fact_actividad : sk_inversor
+  dim_tipo_contexto ||--o{ fact_actividad : sk_tipo_contexto
+  dim_dispositivo ||--o{ fact_actividad : sk_dispositivo
+  dim_fecha ||--o{ fact_contador_diario : sk_fecha
+  dim_inversor ||--o{ fact_contador_diario : sk_inversor
+  fact_energia_hora {
+    int sk_fecha FK
+    int sk_hora FK
+    int sk_inversor FK
+    numeric e_solar_kwh
+    numeric e_carga_kwh
+    numeric e_red_kwh
+    numeric e_bat_carga_kwh
+    numeric e_bat_descarga_kwh
+    numeric soc_prom_pct
+    int minutos_con_dato
+  }
+  fact_evento {
+    bigint id_evento PK
+    int sk_tipo_evento FK
+    timestamptz inicio_utc
+    timestamptz fin_utc
+    numeric duracion_min
+  }
+  fact_actividad {
+    int id_contexto PK
+    int sk_tipo_contexto FK
+    int sk_dispositivo FK
+    numeric duracion_min
+    bool es_gpu
+  }
+  fact_contador_diario {
+    int sk_fecha FK
+    int sk_inversor FK
+    numeric pv_kwh
+    numeric carga_kwh
+  }
+  dim_inversor {
+    int sk_inversor PK
+    int cod_inversor
+    numeric bateria_kwh
+    timestamptz valido_desde
+    timestamptz valido_hasta
+    bool es_actual
+  }
+  dim_hora {
+    int sk_hora PK
+    string franja
+    string periodo_solar
+    string franja_tarifaria
+  }
+  dim_fecha {
+    int sk_fecha PK
+    date fecha
+    int anio
+    string mes_nombre
+  }

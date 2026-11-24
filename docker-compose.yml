@@ -1,0 +1,78 @@
+# SolarBI · entorno de DESARROLLO local (paso previo a Kubernetes).
+#   cp .env.example .env      # y cambiar contraseñas
+#   docker compose up -d --build
+# La fuente opencem-v1.0.0.sqlite debe estar en ./data/bronze/ (no se versiona).
+# En el clúster se usan los manifiestos de k8s/; este archivo sirve para probar rápido.
+name: solarbi
+
+x-pg: &pg
+  PGHOST: postgres
+  PGPORT: "5432"
+  PGDATABASE: ${POSTGRES_DB}
+
+services:
+  postgres:
+    image: postgres:16.4-alpine          # versión fija, nunca latest
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      BI_LECTOR_PASSWORD: ${BI_LECTOR_PASSWORD}
+      GRAFANA_DB_PASSWORD: ${GRAFANA_DB_PASSWORD}
+      SIM_DB_PASSWORD: ${SIM_DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      retries: 20
+
+  etl:
+    build: { context: ., dockerfile: etl/Dockerfile }
+    image: solarbi-etl:1.0
+    environment:
+      <<: *pg
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      FUENTE_SQLITE: /datos/bronze/opencem-v1.0.0.sqlite
+    volumes:
+      - ./data/bronze:/datos/bronze:ro
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+
+  simulador:
+    build: simulador
+    image: solarbi-simulador:1.0
+    environment:
+      <<: *pg
+      PGUSER: simulador
+      PGPASSWORD: ${SIM_DB_PASSWORD}
+      MODO_FALLA: ${MODO_FALLA:-ninguno}
+    # En Kubernetes es un CronJob; aquí se imita con un bucle de 60 s
+    entrypoint: ["sh", "-c", "while true; do python simulador.py; sleep 60; done"]
+    depends_on:
+      etl: { condition: service_completed_successfully }
+
+  grafana:
+    image: grafana/grafana-oss:11.2.0
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GF_SECURITY_ADMIN_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      PGHOST_GRAFANA: postgres
+      GRAFANA_DB_PASSWORD: ${GRAFANA_DB_PASSWORD}
+      UMBRAL_SOC_ALERTA: "20"
+      UMBRAL_RED_V_ALERTA: "180"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports: ["3000:3000"]
+    depends_on:
+      etl: { condition: service_completed_successfully }
+
+volumes:
+  pgdata:

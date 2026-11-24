@@ -1,0 +1,20 @@
+regla,descripcion,dimension_dq,tratamiento,filas_antes,afectadas,filas_despues
+R01,Lectura sin ninguna medición eléctrica (todas las columnas NULL),Completitud,Descartar,2989759,55658,2934101
+R02,Lectura repetida del mismo inversor con < 1 s de diferencia,Unicidad,Descartar,2934101,20379,2913722
+R03,Batería en 0 V reportando SoC > 0 % (sensor sin dato),Validez,Anular campos de batería,2913722,5,2913722
+R04,Potencia FV incoherente con tensión × corriente (> 20 % o > 50 W),Exactitud,Anular potencia FV,2913722,2230,2913722
+R05,Potencia activa de salida mayor que la aparente (W > VA + 50),Exactitud,Anular potencia de carga,2913722,3799,2913722
+R06,Potencia de red negativa (el inversor no exporta): ruido del medidor,Validez,Corregir a 0,2913722,9,2913722
+R07,Columna gridpowerw_a de semántica ambigua (≈ 60 W constantes); se usa linepowerw_a,Consistencia,Excluir columna,2913722,2910423,2913722
+R08,Canal de temperatura con valor centinela de 120 °C,Validez,Excluir del análisis térmico,2913722,2911323,2913722
+R09,Valores fuera de rango físico del equipo,Validez,Anular campo,2913722,0,2913722
+R10,Hueco de registro mayor a 10 min (no se imputa),Completitud,Convertir en evento,2913722,149,2913722
+R14,"Contexto: se eliminan del JSON comandos, rutas y metadatos de archivos (Ley 1581: minimización)",Privacidad,Corregir (sanitizar JSON),25178,12183,25178
+R15,Contexto sin campo context_type: se deriva de source/task_type,Completitud,Corregir,25178,61,25178
+R16,Contexto con fin anterior al inicio,Validez,Corregir fin = inicio,25178,0,25178
+R11,"Tensión de red < 180 V: NO es dato inválido, es un corte real de red → 20 eventos",Validez (evento vs. error),Convertir en evento,726876,110199,726876
+R12,"SoC ≤ 15 %: NO es dato inválido, es una descarga real de la batería → 26 eventos",Validez (evento vs. error),Convertir en evento,726876,7050,726876
+R13,Salida AC < 100 V: inversor apagado o en falla (evento real) → 62 eventos,Validez (evento vs. error),Convertir en evento,726876,29712,726876
+R17,Contador diario: se toma el máximo del día local (el contador se reinicia a medianoche); días sin contador se omiten,Consistencia,Agregar / Descartar vacíos,542,44,498
+R18,Configuración del inversor: versiones que duran < 24 h se tratan como ruido de lectura (SCD 2),Consistencia,Descartar,109339,109334,5
+R19,"Inversor sin capacidad de batería configurada (0 Ah): se supone 200 Ah, igual al inversor 1",Completitud,Imputar y marcar,5,3,5

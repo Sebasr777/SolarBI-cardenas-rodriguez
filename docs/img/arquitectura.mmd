@@ -1,0 +1,38 @@
+flowchart LR
+  subgraph FUENTE["Fuente · capa Bronze"]
+    Z["Zenodo<br/>OpenCEM v1.0.0<br/>.sqlite.zst + SHA256"] --> S[("opencem-v1.0.0.sqlite<br/>4,4 GB · solo lectura")]
+  end
+  subgraph K8S["Clúster Kubernetes local (Docker Desktop) · namespace solarbi"]
+    direction LR
+    CM["ConfigMap<br/>solarbi-config<br/>umbrales · intervalos"]:::cfg
+    SE["Secret<br/>solarbi-secret<br/>contraseñas"]:::cfg
+    J["Job: etl<br/>imagen solarbi-etl:1.0<br/>Bronze → Silver → Gold"]
+    CJ["CronJob: simulador<br/>cada minuto<br/>imagen solarbi-simulador:1.0"]
+    subgraph PG["StatefulSet: postgres (PostgreSQL 16)"]
+      DB[("silver · gold · audit")]
+      PVC[("PVC datos-postgres-0<br/>5 GiB")]
+    end
+    G["Deployment: grafana 11.2<br/>provisioning: fuente,<br/>tablero y 2 alertas"]
+    SVC1["Service postgres<br/>(DNS interno)"]
+    SVC2["NodePort 30432"]
+    SVC3["NodePort 30300"]
+  end
+  subgraph HOST["Equipo anfitrión"]
+    PBI["Power BI Desktop<br/>(.pbip + TMDL)"]
+    DBV["DBeaver"]
+    NAV["Navegador → Grafana"]
+  end
+  S -- "hostPath (solo lectura)" --> J
+  J --> SVC1 --> DB
+  CJ --> SVC1
+  G --> SVC1
+  DB --- PVC
+  CM -.-> J & CJ & G
+  SE -.-> J & CJ & G & PG
+  SVC2 --> PG
+  PBI --> SVC2
+  DBV --> SVC2
+  NAV --> SVC3 --> G
+  GH["GitHub<br/>código · SQL · YAML · tablero JSON · PBIP"]:::git
+  classDef cfg fill:#fff4d6,stroke:#c58b00
+  classDef git fill:#eef3fa,stroke:#1f5fa8
