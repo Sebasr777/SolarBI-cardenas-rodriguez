@@ -1,0 +1,28 @@
+# Secretos
+.env
+k8s/overlays/*/secreto.env
+# Datos (capa Bronze: se descarga de Zenodo, ver README)
+data/bronze/*
+!data/bronze/.gitkeep
+*.sqlite
+*.zst
+# Parche local con la ruta de los datos en este equipo (lo genera el script)
+k8s/overlays/*/ruta-datos.local.yaml
+# Power BI: caché con datos y configuración local
+powerbi/**/.pbi/cache.abf
+powerbi/**/.pbi/localSettings.json
+*.pbix
+# Python / sistema
+__pycache__/
+*.pyc
+.DS_Store
+.venv/
+
+# Archivos temporales de configuracion y parches locales
+/parche-*.json
+/grafana-alertas-*.json
+/grafana-alertas-*.yaml
+/grafana-tableros.yaml
+
+# Configuracion local del editor
+.vscode/
